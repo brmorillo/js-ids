@@ -40,6 +40,8 @@ export class IdService {
    private static instance: IdService;
    private generator: IIdGenerator;
    private options: IdGeneratorOptions;
+   private snowflakeGenerator?: SnowflakeGenerator;
+   private nanoIdGenerator?: NanoIdGenerator;
 
    private constructor(options: IdGeneratorOptions = {}) {
       this.options = options;
@@ -71,6 +73,14 @@ export class IdService {
       this.options = { ...this.options, ...options };
       const type = options.type || 'uuidv4';
       this.generator = this.createGenerator(type, this.options);
+      
+      // Reset cached generators if configuration changes
+      if (options.snowflake) {
+         this.snowflakeGenerator = undefined;
+      }
+      if (options.nanoid) {
+         this.nanoIdGenerator = undefined;
+      }
    }
 
    /**
@@ -128,10 +138,20 @@ export class IdService {
     * });
     */
    public getSnowflake(options?: SnowflakeOptions): string {
-      // Use provided options, or fall back to configured options, or defaults
-      const finalOptions = options || this.options.snowflake;
-      const generator = new SnowflakeGenerator(finalOptions);
-      return generator.getId();
+      // If options are provided, create a new generator for this specific call
+      if (options) {
+         const generator = new SnowflakeGenerator(options);
+         return generator.getId();
+      }
+
+      // Otherwise, use the cached generator to maintain sequence state
+      if (!this.snowflakeGenerator) {
+         this.snowflakeGenerator = new SnowflakeGenerator(
+            this.options.snowflake
+         );
+      }
+
+      return this.snowflakeGenerator.getId();
    }
 
    /**
@@ -170,12 +190,19 @@ export class IdService {
     * });
     */
    public getNanoId(options?: NanoIdOptions): string {
-      // Merge provided options with configured options
-      const finalOptions = options
-         ? { ...this.options.nanoid, ...options }
-         : this.options.nanoid;
-      const generator = new NanoIdGenerator(finalOptions);
-      return generator.getId();
+      // If options are provided, create a new generator for this specific call
+      if (options) {
+         const finalOptions = { ...this.options.nanoid, ...options };
+         const generator = new NanoIdGenerator(finalOptions);
+         return generator.getId();
+      }
+
+      // Otherwise, use the cached generator
+      if (!this.nanoIdGenerator) {
+         this.nanoIdGenerator = new NanoIdGenerator(this.options.nanoid);
+      }
+
+      return this.nanoIdGenerator.getId();
    }
 
    /**

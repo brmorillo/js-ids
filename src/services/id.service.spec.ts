@@ -215,4 +215,66 @@ describe('IdService', () => {
          expect(id1).not.toBe(id2);
       });
    });
+
+   describe('Snowflake Sequence State', () => {
+      it('should maintain sequence state across multiple calls without options', () => {
+         const service = IdService.getInstance({
+            snowflake: { workerId: 1, processId: 1 },
+         });
+
+         // Generate multiple IDs in rapid succession
+         const ids = Array.from({ length: 100 }, () =>
+            service.getSnowflake()
+         );
+
+         // All IDs should be unique
+         const uniqueIds = new Set(ids);
+         expect(uniqueIds.size).toBe(100);
+
+         // Verify no duplicates by checking each ID
+         ids.forEach((id, index) => {
+            const duplicates = ids.filter((otherId) => otherId === id);
+            expect(duplicates.length).toBe(1); // Should only find itself
+         });
+      });
+
+      it('should handle rapid generation in same millisecond without options', () => {
+         const service = IdService.getInstance({
+            snowflake: { workerId: 2, processId: 3 },
+         });
+
+         // Generate many IDs as fast as possible
+         const ids = Array.from({ length: 1000 }, () =>
+            service.getSnowflake()
+         );
+
+         // All IDs should be unique (no duplicates)
+         const uniqueIds = new Set(ids);
+         expect(uniqueIds.size).toBe(1000);
+      });
+
+      it('should create new generator instance when options are provided', () => {
+         const service = IdService.getInstance();
+
+         // Generate with options (creates new generator each time)
+         const id1 = service.getSnowflake({
+            workerId: 1,
+            processId: 1,
+         });
+
+         // Add delay to ensure different timestamp
+         const start = Date.now();
+         while (Date.now() - start < 2) {
+            // Wait 2ms
+         }
+
+         const id2 = service.getSnowflake({
+            workerId: 1,
+            processId: 1,
+         });
+
+         // IDs should be different due to time difference
+         expect(id1).not.toBe(id2);
+      });
+   });
 });
