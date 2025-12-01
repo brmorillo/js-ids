@@ -1,6 +1,6 @@
 {
    "name": "@brmorillo/ids",
-   "version": "1.0.0",
+   "version": "1.0.1",
    "description": "A flexible and extensible ID generator library supporting multiple ID formats (UUIDv4, UUIDv7, Snowflake, etc)",
    "main": "dist/index.js",
    "module": "dist/index.mjs",
