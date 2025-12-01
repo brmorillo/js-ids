@@ -5,7 +5,7 @@ import type { SnowflakeOptions } from '../interfaces/id-generator.interface';
  * Snowflake ID generator implementation
  * Generates distributed, time-ordered 64-bit IDs
  * Based on Twitter's Snowflake algorithm
- * 
+ *
  * ID Structure (64 bits):
  * - 41 bits: Timestamp (milliseconds since epoch)
  * - 5 bits: Worker ID (0-31)
@@ -30,7 +30,8 @@ export class SnowflakeGenerator implements IIdGenerator {
    private readonly MAX_SEQUENCE = (1 << this.SEQUENCE_BITS) - 1; // 4095
 
    // Bit shifts
-   private readonly TIMESTAMP_SHIFT = this.WORKER_ID_BITS + this.PROCESS_ID_BITS + this.SEQUENCE_BITS; // 22
+   private readonly TIMESTAMP_SHIFT =
+      this.WORKER_ID_BITS + this.PROCESS_ID_BITS + this.SEQUENCE_BITS; // 22
    private readonly WORKER_ID_SHIFT = this.PROCESS_ID_BITS + this.SEQUENCE_BITS; // 17
    private readonly PROCESS_ID_SHIFT = this.SEQUENCE_BITS; // 12
 
@@ -42,13 +43,17 @@ export class SnowflakeGenerator implements IIdGenerator {
       // Validate and set worker ID (0-31)
       this.workerId = options?.workerId ?? 1;
       if (this.workerId < 0 || this.workerId > this.MAX_WORKER_ID) {
-         throw new Error(`Worker ID must be between 0 and ${this.MAX_WORKER_ID}`);
+         throw new Error(
+            `Worker ID must be between 0 and ${this.MAX_WORKER_ID}`
+         );
       }
 
       // Validate and set process ID (0-31)
       this.processId = options?.processId ?? 1;
       if (this.processId < 0 || this.processId > this.MAX_PROCESS_ID) {
-         throw new Error(`Process ID must be between 0 and ${this.MAX_PROCESS_ID}`);
+         throw new Error(
+            `Process ID must be between 0 and ${this.MAX_PROCESS_ID}`
+         );
       }
    }
 
@@ -85,9 +90,12 @@ export class SnowflakeGenerator implements IIdGenerator {
       this.lastTimestamp = timestamp;
 
       // Construct the ID using BigInt to avoid precision loss
-      const timestampBits = BigInt(timestamp - this.epoch) << BigInt(this.TIMESTAMP_SHIFT);
-      const workerIdBits = BigInt(this.workerId) << BigInt(this.WORKER_ID_SHIFT);
-      const processIdBits = BigInt(this.processId) << BigInt(this.PROCESS_ID_SHIFT);
+      const timestampBits =
+         BigInt(timestamp - this.epoch) << BigInt(this.TIMESTAMP_SHIFT);
+      const workerIdBits =
+         BigInt(this.workerId) << BigInt(this.WORKER_ID_SHIFT);
+      const processIdBits =
+         BigInt(this.processId) << BigInt(this.PROCESS_ID_SHIFT);
       const sequenceBits = BigInt(this.sequence);
 
       const id = timestampBits | workerIdBits | processIdBits | sequenceBits;
@@ -113,10 +121,12 @@ export class SnowflakeGenerator implements IIdGenerator {
          (snowflakeId >> BigInt(this.TIMESTAMP_SHIFT)) + BigInt(this.epoch)
       );
       const workerId = Number(
-         (snowflakeId >> BigInt(this.WORKER_ID_SHIFT)) & BigInt(this.MAX_WORKER_ID)
+         (snowflakeId >> BigInt(this.WORKER_ID_SHIFT)) &
+            BigInt(this.MAX_WORKER_ID)
       );
       const processId = Number(
-         (snowflakeId >> BigInt(this.PROCESS_ID_SHIFT)) & BigInt(this.MAX_PROCESS_ID)
+         (snowflakeId >> BigInt(this.PROCESS_ID_SHIFT)) &
+            BigInt(this.MAX_PROCESS_ID)
       );
       const sequence = Number(snowflakeId & BigInt(this.MAX_SEQUENCE));
 

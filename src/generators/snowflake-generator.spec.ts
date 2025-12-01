@@ -34,7 +34,7 @@ describe('SnowflakeGenerator', () => {
       const generator = new SnowflakeGenerator({
          workerId: 1,
          processId: 1,
-         epoch: customEpoch
+         epoch: customEpoch,
       });
       const id = generator.getId();
 
@@ -107,19 +107,23 @@ describe('SnowflakeGenerator', () => {
    });
 
    it('should throw error for invalid workerId', () => {
-      expect(() => new SnowflakeGenerator({ workerId: 32, processId: 1 }))
-         .toThrow('Worker ID must be between 0 and 31');
+      expect(
+         () => new SnowflakeGenerator({ workerId: 32, processId: 1 })
+      ).toThrow('Worker ID must be between 0 and 31');
 
-      expect(() => new SnowflakeGenerator({ workerId: -1, processId: 1 }))
-         .toThrow('Worker ID must be between 0 and 31');
+      expect(
+         () => new SnowflakeGenerator({ workerId: -1, processId: 1 })
+      ).toThrow('Worker ID must be between 0 and 31');
    });
 
    it('should throw error for invalid processId', () => {
-      expect(() => new SnowflakeGenerator({ workerId: 1, processId: 32 }))
-         .toThrow('Process ID must be between 0 and 31');
+      expect(
+         () => new SnowflakeGenerator({ workerId: 1, processId: 32 })
+      ).toThrow('Process ID must be between 0 and 31');
 
-      expect(() => new SnowflakeGenerator({ workerId: 1, processId: -1 }))
-         .toThrow('Process ID must be between 0 and 31');
+      expect(
+         () => new SnowflakeGenerator({ workerId: 1, processId: -1 })
+      ).toThrow('Process ID must be between 0 and 31');
    });
 
    it('should handle sequence overflow within same millisecond', () => {
