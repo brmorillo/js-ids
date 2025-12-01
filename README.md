@@ -478,4 +478,3 @@ MIT © Bruno Morillo
 ## Support
 
 For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/brmorillo/js-ids).
-
